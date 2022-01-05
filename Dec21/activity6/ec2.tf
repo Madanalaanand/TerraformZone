@@ -22,7 +22,7 @@ resource "aws_instance" "web_instance_1" {
   ami                           = "ami-0892d3c7ee96c0bf7"
   associate_public_ip_address   = true
   instance_type                 = "t2.micro"
-  key_name                      = "fortf" 
+  key_name                      = "ec2" 
   vpc_security_group_ids        = [data.aws_security_group.open_all.id]
   subnet_id                     = data.aws_subnet.first.id
 
@@ -40,7 +40,7 @@ resource "null_resource" "deployapp" {
     connection {
       type          = "ssh"
       user          = "ubuntu"
-      private_key   = file("./fortf.pem")
+      private_key   = file("./ec2.pem")
       host          = aws_instance.web_instance_1.public_ip
     }
     # install necesssary stuff to make ansible work on the newly cretaed node
@@ -55,7 +55,7 @@ resource "null_resource" "deployapp" {
     # playbook to run on the newly create node
 
     provisioner "local-exec" {
-        command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu -i '${aws_instance.web_instance_1.public_ip},' --private-key './fortf.pem' sample.yaml"
+        command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ubuntu -i '${aws_instance.web_instance_1.public_ip},' --private-key './ec2.pem' sample.yaml"
       
     }
 
